@@ -35,6 +35,38 @@ export async function create(req, res) {
   }
 }
 
+export async function update(req, res) {
+  try {
+    const { nom, origen, tipus, descripcio } = req.body;
+    if (!nom || !origen || !tipus || !descripcio) {
+      return res.status(400).json({ error: 'Falten camps obligatoris: nom, origen, tipus, descripcio' });
+    }
+    const item = await Bacalla.findByIdAndUpdate(
+      req.params.id,
+      { nom, origen, tipus, descripcio },
+      { new: true }
+    );
+    if (!item) {
+      return res.status(404).json({ error: `Bacallà amb id ${req.params.id} no trobat` });
+    }
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({ error: 'Error actualitzant el bacallà' });
+  }
+}
+
+export async function remove(req, res) {
+  try {
+    const item = await Bacalla.findByIdAndDelete(req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: `Bacallà amb id ${req.params.id} no trobat` });
+    }
+    res.json({ message: 'Bacallà eliminat correctament' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error eliminant el bacallà' });
+  }
+}
+
 // ── Versió array en memòria (Nivell 1 i 2) ────────────────────────────────
 // import bacalla from '../data/bacalla.js';
 //
@@ -60,4 +92,28 @@ export async function create(req, res) {
 //   const nouBacalla = { id: nouId, nom, origen, tipus, descripcio };
 //   bacalla.push(nouBacalla);
 //   res.status(201).json(nouBacalla);
+// }
+//
+// export function update(req, res) {
+//   const id = parseInt(req.params.id);
+//   const index = bacalla.findIndex(b => b.id === id);
+//   if (index === -1) {
+//     return res.status(404).json({ error: `Bacallà amb id ${id} no trobat` });
+//   }
+//   const { nom, origen, tipus, descripcio } = req.body;
+//   if (!nom || !origen || !tipus || !descripcio) {
+//     return res.status(400).json({ error: 'Falten camps obligatoris: nom, origen, tipus, descripcio' });
+//   }
+//   bacalla[index] = { id, nom, origen, tipus, descripcio };
+//   res.json(bacalla[index]);
+// }
+//
+// export function remove(req, res) {
+//   const id = parseInt(req.params.id);
+//   const index = bacalla.findIndex(b => b.id === id);
+//   if (index === -1) {
+//     return res.status(404).json({ error: `Bacallà amb id ${id} no trobat` });
+//   }
+//   bacalla.splice(index, 1);
+//   res.json({ message: 'Bacallà eliminat correctament' });
 // }
